@@ -45,13 +45,22 @@ separate bridge authentication token:
 openssl rand -hex 32
 ```
 
-In Coolify, create a **Public Repository** resource from:
+The recommended deployment uses the public, multi-architecture image built by
+GitHub Actions:
 
 ```text
-https://github.com/0xtlt/coolify-glitchtip-bridge
+ghcr.io/0xtlt/coolify-glitchtip-bridge:latest
 ```
 
-Use the repository `Dockerfile`, expose port `8080`, and set:
+In Coolify, select **+ New → Docker Image**, paste that image reference, and set
+the exposed internal port to `8080`. No registry credentials are required for
+this public image.
+
+For reproducible production deployments, prefer a version tag such as `1.0.0`
+or an immutable image digest instead of the mutable `latest` tag. Every commit
+on `main` also receives a `sha-<short-commit>` tag.
+
+Set these runtime environment variables:
 
 ```env
 GLITCHTIP_DSN=https://public-key@glitchtip.example.com/1
@@ -61,6 +70,10 @@ ENVIRONMENT=production
 
 Assign an HTTPS domain such as `coolify-errors.example.com`. The health check
 is `GET /healthz`.
+
+If you prefer Coolify to build from source, create a **Public Repository**
+resource from `https://github.com/0xtlt/coolify-glitchtip-bridge` and use its
+`Dockerfile`.
 
 **Do not enable Drain Logs on the bridge resource itself.** Forwarding the
 bridge's own transport errors can create a feedback loop. The sample Fluent Bit
@@ -199,6 +212,25 @@ cargo fmt --all -- --check
 cargo test --all-targets --locked
 cargo clippy --all-targets --locked -- -D warnings
 docker build --tag coolify-glitchtip-bridge:test .
+```
+
+## Published images
+
+GitHub Actions publishes
+[`ghcr.io/0xtlt/coolify-glitchtip-bridge`](https://github.com/0xtlt/coolify-glitchtip-bridge/pkgs/container/coolify-glitchtip-bridge)
+for `linux/amd64` and `linux/arm64` after the Rust checks pass.
+
+| Git ref | Published tags |
+| --- | --- |
+| Default branch `main` | `latest`, `sha-<short-commit>` |
+| Git tag `v1.2.3` | `1.2.3`, `1.2`, `sha-<short-commit>` |
+| Manual workflow run | `latest` when run from `main`, plus `sha-<short-commit>` |
+
+Images include OCI source metadata, an SBOM, and BuildKit provenance. Pull the
+current image without authentication:
+
+```bash
+docker pull ghcr.io/0xtlt/coolify-glitchtip-bridge:latest
 ```
 
 ## Operational notes

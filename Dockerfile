@@ -13,6 +13,10 @@ RUN apk add --no-cache ca-certificates \
     && addgroup -S -g 10001 bridge \
     && adduser -S -D -H -u 10001 -G bridge bridge
 
+LABEL org.opencontainers.image.source="https://github.com/0xtlt/coolify-glitchtip-bridge" \
+      org.opencontainers.image.description="Forward Coolify log drains and operational failures to GlitchTip" \
+      org.opencontainers.image.licenses="MIT"
+
 COPY --from=builder /build/target/release/coolify-glitchtip-bridge /usr/local/bin/coolify-glitchtip-bridge
 
 USER bridge
