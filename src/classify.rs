@@ -42,10 +42,10 @@ impl Classifier {
     }
 
     pub fn classify(&self, record: &LogRecord) -> EventLevel {
-        if let Some(level) = record.explicit_level.as_deref() {
-            if let Ok(level) = EventLevel::from_str(level) {
-                return level;
-            }
+        if let Some(level) = record.explicit_level.as_deref()
+            && let Ok(level) = EventLevel::from_str(level)
+        {
+            return level;
         }
         if self.fatal.is_match(&record.message) {
             EventLevel::Fatal
