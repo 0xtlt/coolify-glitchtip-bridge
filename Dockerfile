@@ -1,4 +1,4 @@
-FROM rust:1.88.0-alpine3.21 AS builder
+FROM rust:1.99.1-alpine3.24 AS builder
 
 RUN apk add --no-cache build-base
 WORKDIR /build
@@ -7,7 +7,7 @@ COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 RUN cargo build --locked --release
 
-FROM alpine:3.21
+FROM alpine:3.24.2
 
 RUN apk add --no-cache ca-certificates \
     && addgroup -S -g 10001 bridge \
